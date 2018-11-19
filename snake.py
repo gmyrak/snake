@@ -12,7 +12,8 @@ cnv.pack()
 
 
 def sqr(x, y):
-    return cnv.create_rectangle(x*SIZE_PIC, y*SIZE_PIC, x*SIZE_PIC+SIZE_PIC, y*SIZE_PIC+SIZE_PIC, fill='green')
+    return cnv.create_rectangle(x*SIZE_PIC, y*SIZE_PIC, x*SIZE_PIC+SIZE_PIC, y*SIZE_PIC+SIZE_PIC,
+                                fill='green', tag='snake')
 
 
 class Snake():
@@ -22,10 +23,12 @@ class Snake():
         self.items = []
         self.dir = 'E'
         for i in range(L0):
-            self.items.append(sqr(x, y))
-            x += 1
+            self.items.append((x, y, sqr(x, y)))
+            x -= 1
 
-    #def step(self):
+    def step(self):
+        head = 1
+
 
 
 
