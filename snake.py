@@ -20,10 +20,12 @@ class Snake():
     def __init__(self):
         L0 = 4
         x, y = 10, 9
-        self.items = []
+        self.list_items = []
+        self.dict_items = {}
         self.dir = 'E'
         for i in range(L0):
-            self.items.append((x, y, sqr(x, y)))
+            self.list_items.append((x, y))
+            self.dict_items[(x ,y)] = sqr(x, y)
             x -= 1
 
     def step(self):
