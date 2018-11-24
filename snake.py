@@ -16,24 +16,51 @@ def sqr(x, y):
                                 fill='green', tag='snake')
 
 
+#def key_press(k):
+
+
+
 class Snake():
+
+    def key_press(self, k):
+        self.dir = k.keysym
+        print(self.dir)
+        self.step()
+
+    def add(self, x, y):
+        self.list_items.append((x, y))
+        self.dict_items[(x, y)] = sqr(x, y)
+
+    def _del(self):
+        x, y = self.list_items.pop()
+        p = self.dict_items.pop((x, y))
+        cnv.delete(p)
+
+
     def __init__(self):
         L0 = 4
         x, y = 10, 9
         self.list_items = []
         self.dict_items = {}
-        self.dir = 'E'
+        self.dir = 'Right'
         for i in range(L0):
-            self.list_items.append((x, y))
-            self.dict_items[(x ,y)] = sqr(x, y)
+            self.add(x, y)
             x -= 1
+        root.bind('<KeyPress>', self.key_press)
 
     def step(self):
-        head = 1
+        x, y = self.list_items[0]
+        if self.dir == 'Up':
+            y -= 1
+        elif self.dir == 'Down':
+            y += 1
+        elif self.dir == 'Left':
+            x -= 1
+        elif self.dir == 'Right':
+            x += 1
 
-
-
-
+        self.add(x, y)
+        self._del()
 
 s = Snake()
 
