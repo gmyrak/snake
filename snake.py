@@ -1,4 +1,5 @@
 from tkinter import *
+import random
 
 SIZE_PIC = 20
 X_SIZE, Y_SIZE = 30, 20
@@ -11,41 +12,36 @@ cnv = Canvas(root, width=w, height=h, bg='white')
 cnv.pack()
 
 
-def sqr(x, y):
+def sqr(x, y, color, tag = 'unknown'):
     return cnv.create_rectangle(x*SIZE_PIC, y*SIZE_PIC, x*SIZE_PIC+SIZE_PIC, y*SIZE_PIC+SIZE_PIC,
-                                fill='green', tag='snake')
-
-
-#def key_press(k):
-
+                                fill=color, tag=tag)
 
 
 class Snake():
-
     def key_press(self, k):
-        self.dir = k.keysym
-        print(self.dir)
+        if k.keysym in {'Up', 'Down', 'Left', 'Right'}:
+            self.dir = k.keysym
         self.step()
 
-    def add(self, x, y):
-        self.list_items.append((x, y))
-        self.dict_items[(x, y)] = sqr(x, y)
+    def _add(self, x, y):
+        self.list_items.insert(0, (x, y))
+        self.dict_items[(x, y)] = sqr(x, y, 'green', 'snake')
 
     def _del(self):
         x, y = self.list_items.pop()
         p = self.dict_items.pop((x, y))
         cnv.delete(p)
 
-
     def __init__(self):
-        L0 = 4
+        L0 = 6
         x, y = 10, 9
         self.list_items = []
         self.dict_items = {}
         self.dir = 'Right'
+        self.ok = True
         for i in range(L0):
-            self.add(x, y)
-            x -= 1
+            self._add(x, y)
+            x += 1
         root.bind('<KeyPress>', self.key_press)
 
     def step(self):
@@ -58,11 +54,32 @@ class Snake():
             x -= 1
         elif self.dir == 'Right':
             x += 1
+        if 0 <= x < X_SIZE and 0 <= y < Y_SIZE and not (x, y) in self.dict_items:
+            self._add(x, y)
+            self._del()
+        else:
+            self.ok = False
 
-        self.add(x, y)
-        self._del()
 
-s = Snake()
+class Apple():
+    def __init__(self, x, y):
+        self.pos = (x, y)
+        self.p = sqr(x, y, 'red', 'apple')
 
+
+class Game():
+    def __init__(self):
+        self.snake = Snake()
+        self.put_apple()
+
+    def put_apple(self):
+        while True:
+            x1 = random.randint(0, X_SIZE-1)
+            y1 = random.randint(0, Y_SIZE-1)
+            if not (x1, y1) in self.snake.dict_items:
+                break
+        self.apple = Apple(x1, y1)
+
+Game()
 
 root.mainloop()
