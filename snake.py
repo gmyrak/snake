@@ -11,6 +11,12 @@ root.resizable(0, 0)
 cnv = Canvas(root, width=w, height=h, bg='white')
 cnv.pack()
 
+inf = Frame(root, height= 30)
+inf.pack(fill=X)
+
+but_ng = Button(inf, text='New Game', command=lambda : Game())
+but_ng.pack(side=LEFT)
+
 
 def sqr(x, y, color, tag = 'unknown'):
     return cnv.create_rectangle(x*SIZE_PIC, y*SIZE_PIC, x*SIZE_PIC+SIZE_PIC, y*SIZE_PIC+SIZE_PIC,
@@ -69,17 +75,20 @@ class Apple():
 
 class Game():
     def __init__(self):
+        cnv.delete('all')
+        self.timeout = 1
         self.snake = Snake()
-        self.put_apple()
+        self.apple = self.get_apple()
 
-    def put_apple(self):
+    def get_apple(self):
         while True:
             x1 = random.randint(0, X_SIZE-1)
             y1 = random.randint(0, Y_SIZE-1)
             if not (x1, y1) in self.snake.dict_items:
                 break
-        self.apple = Apple(x1, y1)
+        return Apple(x1, y1)
+
+
 
 Game()
-
 root.mainloop()
