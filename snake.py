@@ -1,8 +1,9 @@
 from tkinter import *
 import random
+from time import time
 
-SIZE_PIC = 20
-X_SIZE, Y_SIZE = 30, 20
+SIZE_PIC = 10
+X_SIZE, Y_SIZE = 80, 80
 
 w, h = X_SIZE*SIZE_PIC, Y_SIZE*SIZE_PIC
 
@@ -11,11 +12,14 @@ root.resizable(0, 0)
 cnv = Canvas(root, width=w, height=h, bg='white')
 cnv.pack()
 
-inf = Frame(root, height= 30)
-inf.pack(fill=X)
+panel = Frame(root, height= 30)
+panel.pack(fill=X)
 
-but_ng = Button(inf, text='New Game', command=lambda : Game())
+but_ng = Button(panel, text='New Game', command=lambda : Game())
 but_ng.pack(side=LEFT)
+
+inf = Label(panel, text='')
+inf.pack(side=LEFT)
 
 
 def sqr(x, y, color, tag = 'unknown'):
@@ -27,7 +31,7 @@ class Snake():
     def key_press(self, k):
         if k.keysym in {'Up', 'Down', 'Left', 'Right'}:
             self.dir = k.keysym
-        self.step()
+        #self.step()
 
     def _add(self, x, y):
         self.list_items.insert(0, (x, y))
@@ -39,13 +43,14 @@ class Snake():
         cnv.delete(p)
 
     def __init__(self):
-        L0 = 6
+        self.length = 6
         x, y = 10, 9
         self.list_items = []
         self.dict_items = {}
         self.dir = 'Right'
         self.ok = True
-        for i in range(L0):
+        self.eating = False
+        for i in range(self.length):
             self._add(x, y)
             x += 1
         root.bind('<KeyPress>', self.key_press)
@@ -62,7 +67,10 @@ class Snake():
             x += 1
         if 0 <= x < X_SIZE and 0 <= y < Y_SIZE and not (x, y) in self.dict_items:
             self._add(x, y)
-            self._del()
+            if not self.eating:
+                self._del()
+            else:
+                self.eating = False
         else:
             self.ok = False
 
@@ -76,9 +84,13 @@ class Apple():
 class Game():
     def __init__(self):
         cnv.delete('all')
-        self.timeout = 1
+        self.timeout = 200
         self.snake = Snake()
         self.apple = self.get_apple()
+        inf['text'] = self.snake.length
+        self.start_time = time()
+        self.run()
+
 
     def get_apple(self):
         while True:
@@ -87,6 +99,20 @@ class Game():
             if not (x1, y1) in self.snake.dict_items:
                 break
         return Apple(x1, y1)
+
+    def run(self):
+        self.timeout -= int((time() - self.start_time)/10)
+        self.snake.step()
+        inf['text'] = len(self.snake.list_items)
+        if self.snake.ok:
+            if self.snake.list_items[0] == self.apple.pos:
+                self.snake.eating = True
+                cnv.delete(self.apple.p)
+                self.apple = self.get_apple()
+            cnv.after(self.timeout, self.run)
+        else:
+            inf['text'] = 'Game Over!'
+            cnv['bg'] = 'orange2'
 
 
 
