@@ -2,8 +2,8 @@ from tkinter import *
 import random
 from time import time
 
-SIZE_PIC = 10
-X_SIZE, Y_SIZE = 80, 80
+SIZE_PIC = 30
+X_SIZE, Y_SIZE = 20, 20
 
 w, h = X_SIZE*SIZE_PIC, Y_SIZE*SIZE_PIC
 
@@ -27,10 +27,11 @@ def sqr(x, y, color, tag = 'unknown'):
                                 fill=color, tag=tag)
 
 
+def circl(x, y, color, tag = 'unknown'):
+    return cnv.create_oval(x*SIZE_PIC, y*SIZE_PIC, x*SIZE_PIC+SIZE_PIC, y*SIZE_PIC+SIZE_PIC,
+                                fill=color, tag=tag)
+
 class Snake():
-    def key_press(self, k):
-        if k.keysym in {'Up', 'Down', 'Left', 'Right'}:
-            self.dir = k.keysym
         #self.step()
 
     def _add(self, x, y):
@@ -44,16 +45,16 @@ class Snake():
 
     def __init__(self):
         self.length = 6
-        x, y = 10, 9
+        self.dir = 'Right'
+        x, y = 0, Y_SIZE//2
         self.list_items = []
         self.dict_items = {}
-        self.dir = 'Right'
         self.ok = True
         self.eating = False
         for i in range(self.length):
             self._add(x, y)
             x += 1
-        root.bind('<KeyPress>', self.key_press)
+        #root.bind('<KeyPress>', self.key_press)
 
     def step(self):
         x, y = self.list_items[0]
@@ -78,30 +79,37 @@ class Snake():
 class Apple():
     def __init__(self, x, y):
         self.pos = (x, y)
-        self.p = sqr(x, y, 'red', 'apple')
+        self.p = circl(x, y, 'red', 'apple')
 
 
 class Game():
     def __init__(self):
         cnv.delete('all')
+        cnv['bg'] = 'sky blue'
         self.timeout = 200
         self.snake = Snake()
         self.apple = self.get_apple()
         inf['text'] = self.snake.length
         self.start_time = time()
+        self.go = True
+        root.bind('<KeyPress>', self.key_press)
+
         self.run()
 
+    def key_press(self, k):
+        if k.keysym in {'Up', 'Down', 'Left', 'Right'}:
+            self.snake.dir = k.keysym
 
     def get_apple(self):
         while True:
-            x1 = random.randint(0, X_SIZE-1)
-            y1 = random.randint(0, Y_SIZE-1)
+            x1 = random.randint(1, X_SIZE-2)
+            y1 = random.randint(1, Y_SIZE-2)
             if not (x1, y1) in self.snake.dict_items:
                 break
         return Apple(x1, y1)
 
     def run(self):
-        self.timeout -= int((time() - self.start_time)/10)
+        #self.timeout -= int((time() - self.start_time)/10)
         self.snake.step()
         inf['text'] = len(self.snake.list_items)
         if self.snake.ok:
@@ -117,4 +125,5 @@ class Game():
 
 
 Game()
+
 root.mainloop()
